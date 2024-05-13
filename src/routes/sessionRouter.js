@@ -1,8 +1,7 @@
 import { Router } from "express"
-//import userManager from "../dao/controllers/mongoDB/userManagerMongo.js"
-import usersModel from "../dao/models/usersModel.js";
-import utils, { createHash, isValidPassword } from "../utils.js"
-import passport from "passport";
+import usersService from "../dao/services/users.service.js"
+import { createHash } from "../utils.js"
+import passport from "passport"
 
 const sessionRouter = Router()
 
@@ -70,18 +69,17 @@ sessionRouter.get("/current", async (req, res) => {
 //Restaurar password
 sessionRouter.post("/restore", async (req, res) => {
   const {email, password} = req.body
-  const user= await usersModel.findOne({email})
+  if(!email || !password) return
 
+  const user = await usersService.findUserByEmail(email)
   if(!user){
     return res.status(400).send({status: "error", message:"No se encuentra usuario"})
   }
 
   const newPass = createHash(password)
-
-  await usersModel.updateOne({_id: user._id}, {$set:{password:newPass}})
-
+  const pwd = {password: newPass}
+  await usersService.updateUser(user, pwd)
   res.send({status:"success", message: "Clave actualizada"})
-
 })
 
 export default sessionRouter

@@ -71,7 +71,7 @@ socketServer.on('connection', async(socket)=>{
     socket.on("altaProducto", async(obj)=>{
         try {
             await productsService.addProduct(obj)
-            const lstProd = await productos.getProducts()
+            const lstProd = await productsService.getProducts()
             socketServer.emit("listaProductos",lstProd)
         } catch (error) {
             console.log("Error al crear producto: ", error.message)
@@ -79,14 +79,22 @@ socketServer.on('connection', async(socket)=>{
     })
 
     socket.on("deleteProduct", async(prodId)=>{
-        await productsService.deleteProduct(prodId)
-        const lstProd = await productos.getProducts()
-        socketServer.emit("listaProductos",lstProd)
+        try {
+            await productsService.deleteProduct(prodId)
+            const lstProd = await productsService.getProducts()
+            socketServer.emit("listaProductos",lstProd)
+        } catch (error) {
+            console.log("Error al eliminar producto: ", error.message)
+        }
     })
 
     socket.on("mensaje", async (info) => {
-        await msg.createMessage(info)
-         socketServer.emit("chat", await msg.getMessages())
+        try {
+            await msg.createMessage(info)
+            socketServer.emit("chat", await msg.getMessages())
+        } catch (error) {
+            console.log("Error al cargar chat: ", error.message)
+        }
       })
 
 })

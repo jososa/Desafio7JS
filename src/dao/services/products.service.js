@@ -87,5 +87,6 @@ export default {
     getProductById,
     addProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProducts
 }
